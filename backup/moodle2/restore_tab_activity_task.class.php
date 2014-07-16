@@ -51,7 +51,7 @@ class restore_tab_activity_task extends restore_activity_task
 
         $contents[] = new restore_decode_content('tab', array('intro'), 'tab');
         $contents[] = new restore_decode_content('tab_content', array('tabcontent'), 'tab_content');
-        
+
         return $contents;
     }
 
@@ -66,6 +66,15 @@ class restore_tab_activity_task extends restore_activity_task
 
         return $rules;
 
+    }
+
+    static public function define_restore_log_rules() {
+
+         $rules = array();
+         $rules[] = new restore_log_rule('tab', 'view', 'view.php?id={course_module}', '{tab}');
+         $rules[] = new restore_log_rule('tab', 'view all', 'index.php?id={course_module}', '{tab}');
+
+         return $rules;
     }
 
 }
