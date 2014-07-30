@@ -11,4 +11,5 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later  **
  * *************************************************************************
  * ************************************************************************ */
-var TabbedPanels1 = new Spry.Widget.TabbedPanels("TabbedPanels1");
+//var opts = {initialTab:0};
+var TabbedPanels1 = new Spry.Widget.TabbedPanels("TabbedPanels1", opts);

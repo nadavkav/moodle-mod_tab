@@ -13,7 +13,7 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later  **
  * *************************************************************************
  * ************************************************************************ */
-$module->version = 2014040200;  // The current module version (Date: YYYYMMDDXX)
+$module->version = 2014040202;  // The current module version (Date: YYYYMMDDXX)
 $module->requires = 2010112400;
 $module->maturity = MATURITY_STABLE;
 $module->release = '2.2.0 (Build: 2014040200)';

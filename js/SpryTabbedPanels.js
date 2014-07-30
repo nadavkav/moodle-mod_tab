@@ -34,7 +34,8 @@ if (typeof Spry == "undefined") window.Spry = {}; if (!Spry.Widget) Spry.Widget 
 Spry.Widget.TabbedPanels = function(element, opts)
 {
 	this.element = this.getElement(element);
-	this.defaultTab = 0; // Show the first panel by default.
+	//this.defaultTab = 0; // Show the first panel by default.
+    this.defaultTab = opts.initialTab;
 	this.tabSelectedClass = "TabbedPanelsTabSelected";
 	this.tabHoverClass = "TabbedPanelsTabHover";
 	this.tabFocusedClass = "TabbedPanelsTabFocused";
@@ -315,7 +316,7 @@ Spry.Widget.TabbedPanels.prototype.addPanelEventListeners = function(tab, panel)
 
 		// Find the first element within the tab container that has a tabindex or the first
 		// anchor tag.
-		
+
 		var tabIndexEle = null;
 		var tabAnchorEle = null;
 
@@ -351,12 +352,12 @@ Spry.Widget.TabbedPanels.prototype.addPanelEventListeners = function(tab, panel)
 Spry.Widget.TabbedPanels.prototype.showPanel = function(elementOrIndex)
 {
 	var tpIndex = -1;
-	
+
 	if (typeof elementOrIndex == "number")
 		tpIndex = elementOrIndex;
 	else // Must be the element for the tab or content panel.
 		tpIndex = this.getTabIndex(elementOrIndex);
-	
+
 	if (!tpIndex < 0 || tpIndex >= this.getTabbedPanelCount())
 		return;
 

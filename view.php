@@ -21,6 +21,7 @@ require_once($CFG->dirroot . '/lib/completionlib.php');
 
 $id = optional_param('id', 0, PARAM_INT); // Course Module ID, or
 $a = optional_param('a', 0, PARAM_INT); // tab ID
+$showtab = optional_param('showtab', 0, PARAM_INT); // tab index, to show
 
 if ($id)
 {
@@ -51,19 +52,25 @@ $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST)
 
 require_course_login($course, true, $cm);
 //Replace get_context_instance by the class for moodle 2.6+
-if(class_exists('context_module'))
-{
+if(class_exists('context_module')) {
+    $context = context_module::instance($cm->id);
+    $coursecontext = context_course::instance($course->id);
+} else {
     $context = context_module::instance($cm->id);
     $coursecontext = context_course::instance($course->id);
 }
-else
-{
-    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
-    $coursecontext = get_context_instance(CONTEXT_COURSE, $course->id);
-}
 
 require_capability('mod/tab:view', $context);
-add_to_log($course->id, "tab", "view", "view.php?id=$cm->id", "$tab->id - $tab->name");
+//add_to_log($course->id, "tab", "view", "view.php?id=$cm->id", "$tab->id - $tab->name");
+$params = array(
+    'context' => $context,
+    'objectid' => $tab->id
+);
+$event = \mod_tab\event\course_module_viewed::create($params);
+$event->add_record_snapshot('course_modules', $cm);
+$event->add_record_snapshot('course', $course);
+$event->add_record_snapshot('tab', $tab);
+$event->trigger();
 
 // Update 'viewed' state if required by completion system
 $completion = new completion_info($course);
@@ -85,6 +92,7 @@ if ($PAGE->user_allowed_editing())
 }
 //Gather javascripts and css
 $PAGE->requires->js('/mod/tab/js/SpryTabbedPanels.js', true);
+$PAGE->requires->js('/mod/tab/js/init_tab.php?showtab='.$showtab);
 $PAGE->requires->js('/mod/tab/js/tab.js');
 $PAGE->requires->css('/mod/tab/SpryTabbedPanels.css');
 $PAGE->requires->css('/mod/tab/styles.css');
@@ -167,7 +175,7 @@ $i = 0;
 
 foreach (array_keys($options) as $key)
 {
-    $tabdisplay .= '    <li class="TabbedPanelsTab" tabindex="0">' . $options[$key]->tabname . '</li>';
+    $tabdisplay .= '    <li class="TabbedPanelsTab" tabindex="'.$key.'">' . $options[$key]->tabname . '</li>';
 }
 $tabdisplay .= '  </ul>' . "\n";
 $tabdisplay .= '  <div class="TabbedPanelsContentGroup">' . "\n";
@@ -206,12 +214,12 @@ foreach (array_keys($options) as $key)
         $content[$key] = format_text($content[$key], $options[$key]->contentformat, $editoroptions, $context);
         //PDF
         $content2 = str_ireplace(array(' ', "\n", "\r", "\t", '&nbsp;'), array(), strip_tags($content[$key], '<a>'));
-        
+
         if (stripos($content2, '<a') === 0 && stripos($content2, '</a>') >= strlen($content2) - 4)
         {
             $start = strpos($content2, '"')+1;
             $l = strpos($content2, '"', $start+1) - $start;
-            
+
             $href = substr($content2, $start, $l);
             if(stripos($href, '.pdf') !== false)
             {
